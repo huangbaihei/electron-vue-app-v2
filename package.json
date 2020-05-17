@@ -26,6 +26,9 @@
   "build": {
     "productName": "electron-vue",
     "appId": "com.example.yourapp",
+    "electronDownload": {
+      "mirror": "https://npm.taobao.org/mirrors/electron/"
+    },
     "extraResources": [
       {
         "from": "src/main/go",
