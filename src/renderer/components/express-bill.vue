@@ -83,7 +83,7 @@ export default {
           }
         }
         for (let i = 1; i < sheetData.length; i++) {
-          for (let j = 0; j < sheetData[i].length; j++) {
+          for (let j = 0; j < sheetData[0].length; j++) {
             this.textObj[keyOrderMap[j]] = sheetData[i][j]
           }
           await this.sleep(1)
