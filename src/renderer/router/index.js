@@ -9,7 +9,7 @@ export default new Router({
       path: '/',
       name: 'landing-page',
       // component: require('@/components/LandingPage').default
-      component: require('@/components/xlsx').default
+      component: require('@/components/index').default
     },
     {
       path: '*',
