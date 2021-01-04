@@ -8,7 +8,7 @@
       <div class="form-title">
         {{stepMap[mode].step1.title}}
       </div>
-      <div class="form-input">
+      <div class="form-input" style="height: 44px;">
         <el-button class="downloan-btn" type="text" v-if="mode == '2'" @click="pathDialog.showDialog = true">点击下载</el-button>
         <div v-else>{{stepMap[mode].step1.detail}}</div>
       </div>
@@ -95,7 +95,7 @@ export default {
         '1': {
           step1: {
             title: '1、确认excel表列字段名和顺序',
-            detail: '账户号 交易描述 卡号 交易日期 币种 交易金额 余额 姓名 证件号码 编号'
+            detail: '账户号 交易描述 卡号 交易日期 币种 交易金额 余额 姓名 证件号码 编号 案号（案号可以为空）'
           },
           step2: {
             title: '2、选择需要处理的excel文件',
@@ -226,7 +226,7 @@ export default {
         // this.isLoading = false
 
         let tcpData = ''
-        const client = net.connect({ port: 9800 })
+        const client = net.connect({ port: 9889 })
         // client.write(JSON.stringify(this.sourcePathList))
         client.write(JSON.stringify([...this.sourcePathList, this.folderPath]))
         client.on('data', async data => {
@@ -317,7 +317,7 @@ export default {
       flex-shrink: 0;
     }
     .form-input {
-      width: 523px;
+      width: 515px;
       flex-shrink: 0;
     }
     .folder-path {
