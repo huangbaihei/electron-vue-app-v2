@@ -2,14 +2,16 @@
   <div class="index-page">
     <el-tabs class="m-b-30" v-model="mode" @tab-click="handleClick">
       <el-tab-pane label="批量拆分交易流水表" name="1" :disabled="isLoading && mode != '1'"></el-tab-pane>
-      <el-tab-pane label="批量生成快递单模板" name="2" :disabled="isLoading && mode != '2'"></el-tab-pane>
+      <el-tab-pane label="批量拆分万用金数据表" name="2" :disabled="isLoading && mode != '2'"></el-tab-pane>
+      <el-tab-pane label="批量拆分万用金短信表" name="3" :disabled="isLoading && mode != '3'"></el-tab-pane>
+      <el-tab-pane label="批量生成快递单模板" name="4" :disabled="isLoading && mode != '4'"></el-tab-pane>
     </el-tabs>
     <div class="form-item">
       <div class="form-title">
         {{stepMap[mode].step1.title}}
       </div>
-      <div class="form-input" style="height: 44px;">
-        <el-button class="downloan-btn" type="text" v-if="mode == '2'" @click="pathDialog.showDialog = true">点击下载</el-button>
+      <div class="form-input" style="height: 68px;">
+        <el-button class="downloan-btn" type="text" v-if="mode == '4'" @click="pathDialog.showDialog = true">点击下载</el-button>
         <div v-else>{{stepMap[mode].step1.detail}}</div>
       </div>
     </div>
@@ -21,14 +23,14 @@
           drag
           multiple
           action=""
-          :limit="mode == 2 ? 1 : undefined"
+          :limit="mode == 4 ? 1 : undefined"
           :auto-upload="false"
           :on-change="onFileChange"
           :on-remove="onFileRemove">
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">
             <div>将文件拖到此处</div>
-            <div v-if="mode == 1">(支持多个)</div>
+            <div v-if="mode != 4">(支持多个)</div>
           </div>
         </el-upload>
       </div>
@@ -51,10 +53,10 @@
         </el-upload>
       </div>
     </div>
-    <el-button type="primary" round @click="mode == 2 ? toStartBill() : toStartXlsx()" :loading="isLoading">{{isLoading ? '正在处理' : '开始处理'}}</el-button>
+    <el-button type="primary" round @click="mode == 4 ? toStartBill() : toStartXlsx()" :loading="isLoading">{{isLoading ? '正在处理' : '开始处理'}}</el-button>
     <div class="log-text" v-if="!log.error">{{log.text}}</div>
     <div class="log-error" v-else>{{log.error}}</div>
-    <express-bill ref="expressBill" :log="log" @end="isLoading = false" v-if="mode == 2"></express-bill>
+    <express-bill ref="expressBill" :log="log" @end="isLoading = false" v-if="mode == 4"></express-bill>
     <get-path-dialog ref="pathDialog" @toDetermine="toDetermine"></get-path-dialog>
   </div>
 </template>
@@ -89,7 +91,7 @@ export default {
         text: '',
         error: ''
       },
-      mode: '1', // 1-'splitXlsx'  2-'expressBill'
+      mode: '1', // 1-拆交易流水 2-拆万用金数据 3-拆万用金短信 4-生成快递单模板
       preMode: '1',
       stepMap: {
         '1': {
@@ -107,6 +109,34 @@ export default {
           }
         },
         '2': {
+          step1: {
+            title: '1、确认excel表列字段名和顺序',
+            detail: '证件号 分期申请编号 期数 放款金额 放款年月 账号 放款日期 交易利息/元 手续费/元 分期类型 渠道 细分渠道 卡号 万用金利率 分期付款类型 总息费/元 地址2 转入卡号 最大期数 客户姓名 案件编号'
+          },
+          step2: {
+            title: '2、选择需要处理的excel文件',
+            detail: ''
+          },
+          step3: {
+            title: '3、选择放置输出excel的文件夹',
+            detail: ''
+          }
+        },
+        '3': {
+          step1: {
+            title: '1、确认excel表列字段名和顺序',
+            detail: '账户号 身份证号 信用卡号 分行代码 日期 时间 手机号码 发送状态 短信内容 客户姓名 案件编号'
+          },
+          step2: {
+            title: '2、选择需要处理的excel文件',
+            detail: ''
+          },
+          step3: {
+            title: '3、选择放置输出excel的文件夹',
+            detail: ''
+          }
+        },
+        '4': {
           step1: {
             title: '1、下载快递单信息汇总excel模板',
             detail: ''
@@ -141,7 +171,7 @@ export default {
   },
   methods: {
     toDetermine (folderPath) {
-      if (this.mode === '2') {
+      if (this.mode === '4') {
         let filePath = path.join(__dirname, '../excel/快递单信息汇总表.xlsx')
         if (process.env.NODE_ENV === 'production') {
           filePath = path.join(process.resourcesPath, 'app.asar.unpacked/excel', '快递单信息汇总表.xlsx')
@@ -228,7 +258,7 @@ export default {
         let tcpData = ''
         const client = net.connect({ port: 9889 })
         // client.write(JSON.stringify(this.sourcePathList))
-        client.write(JSON.stringify([...this.sourcePathList, this.folderPath]))
+        client.write(JSON.stringify([...this.sourcePathList, this.mode, this.folderPath]))
         client.on('data', async data => {
           tcpData += data.toString()
           if (tcpData.startsWith('[')) {
